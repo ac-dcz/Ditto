@@ -88,7 +88,7 @@ class LogParser:
 
     def _parse_nodes(self, log):
         if search(r'panic', log) is not None:
-            raise ParseError('Client(s) panicked')
+            raise ParseError('Client(s) panicked sb')
 
         tmp = findall(r'\[(.*Z) .* Created B\d+\(([^ ]+)\)', log)
         tmp = [(d, self._to_posix(t)) for t, d in tmp]
@@ -249,5 +249,5 @@ class LogParser:
         for filename in sorted(glob(join(directory, 'node-*.log'))):
             with open(filename, 'r') as f:
                 nodes += [f.read()]
-
+                
         return cls(clients, nodes, faults=faults, protocol=protocol, ddos=ddos)

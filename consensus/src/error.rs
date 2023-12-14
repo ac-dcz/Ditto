@@ -1,4 +1,4 @@
-use crate::core::{SeqNumber, HeightNumber};
+use crate::core::{HeightNumber, SeqNumber};
 use crypto::{CryptoError, Digest, PublicKey};
 use store::StoreError;
 use thiserror::Error;
