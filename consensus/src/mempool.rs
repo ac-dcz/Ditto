@@ -52,7 +52,7 @@ impl MempoolDriver {
             .expect("Failed to receive payload status from mempool")
         {
             PayloadStatus::Accept => Ok(true),
-            PayloadStatus::Reject => bail!(ConsensusError::InvalidPayload),
+            PayloadStatus::Reject => Err(ConsensusError::InvalidPayload),
             PayloadStatus::Wait => Ok(false),
         }
     }
@@ -73,11 +73,7 @@ impl MempoolDriver {
     }
 
     pub async fn cleanup_async(&mut self, b0: &Block) {
-        let digests = b0
-            .payload
-            .iter()
-            .cloned()
-            .collect();
+        let digests = b0.payload.iter().cloned().collect();
         let message = ConsensusMempoolMessage::Cleanup(digests, b0.round);
         self.mempool_channel
             .send(message)
