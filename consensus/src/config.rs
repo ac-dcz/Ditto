@@ -29,6 +29,8 @@ pub struct Parameters {
     pub max_payload_size: usize,
     pub min_block_delay: u64,
     pub ddos: bool,
+    pub random_ddos: bool,
+    pub random_ddos_chance: u64,
     pub exp: u64,
 }
 
@@ -41,6 +43,8 @@ impl Default for Parameters {
             network_delay: 100,
             max_payload_size: 500,
             ddos: false,
+            random_ddos: false,
+            random_ddos_chance: 5,
             exp: 1,
         }
     }
@@ -49,7 +53,7 @@ impl Default for Parameters {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Authority {
     pub name: PublicKey,
-    pub id: usize,  // id of the node in the tss public key share set
+    pub id: usize, // id of the node in the tss public key share set
     pub stake: Stake,
     pub address: SocketAddr,
 }
@@ -99,8 +103,8 @@ impl Committee {
     }
 
     // This threshold is used only to sychronize the nodes in a hacky way during the geo-distributed experiments, where different machines can start at different times, but the consensus protocol need most of the nodes to start at roughly the same time to have good performance.
-    // We use the first TC to synchronize the nodes, and we require this TC to have size large_threshold. 
-    // By doing this, we ensure large_threshold nodes can start consensus at roughly the same time. 
+    // We use the first TC to synchronize the nodes, and we require this TC to have size large_threshold.
+    // By doing this, we ensure large_threshold nodes can start consensus at roughly the same time.
     // May need to set to a smaller threshold if the number of machines is large in geo-distributed experiments.
     pub fn large_threshold(&self) -> Stake {
         let total_votes: Stake = self.authorities.values().map(|x| x.stake).sum();

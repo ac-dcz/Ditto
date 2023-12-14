@@ -4,10 +4,10 @@ use bytes::Bytes;
 use futures::stream::futures_unordered::FuturesUnordered;
 use futures::stream::StreamExt as _;
 use network::NetMessage;
+use rand::Rng;
 use std::net::SocketAddr;
 use tokio::sync::mpsc::{Receiver, Sender};
 use tokio::time::{sleep, Duration};
-
 pub type FilterInput = (ConsensusMessage, Vec<SocketAddr>);
 
 pub struct Filter;
@@ -44,8 +44,13 @@ impl Filter {
         if let ConsensusMessage::Propose(block) = message {
             // NOTE: Increase the delay here (you can use any value from the 'parameters').
             // Only add network delay for non-fallback block proposals
-            if parameters.ddos && block.fallback == 0 {
-                sleep(Duration::from_millis(parameters.network_delay)).await;
+            if block.fallback == 0 {
+                if parameters.random_ddos
+                    && rand::thread_rng().gen_bool((parameters.random_ddos_chance as f64) / 100.0)
+                {
+                } else if parameters.ddos {
+                    sleep(Duration::from_millis(parameters.network_delay)).await;
+                }
             }
         }
         input
