@@ -46,9 +46,10 @@ def local(ctx):
 
 
 @task
-def create(ctx, nodes=4):
+def create(ctx, nodes=[1,2,2,2]):
     ''' Create a testbed'''
     try:
+        nodes=[10,10,10,10]
         InstanceManager.make().create_instances(nodes)
     except BenchError as e:
         Print.error(e)
@@ -104,10 +105,10 @@ def remote(ctx):
     ''' Run benchmarks on AWS '''
     bench_params = {
         'nodes': [16],
-        'rate': [20_000, 40_000],
+        'rate': [120_000,100_000],
         'tx_size': 16,
         'faults': 0, 
-        'duration': 120,
+        'duration': 60,
         'runs': 1,
     }
     node_params = {
@@ -119,7 +120,7 @@ def remote(ctx):
             'network_delay': 20_000, # message delay on the leaders' proposals during DDoS
             'ddos': False, # True for DDoS attack on the leader, False otherwise
             'random_ddos': False,
-            'random_ddos_chance': 5,
+            'random_ddos_chance': 20,
             'exp': 1 # multiplicative factor for exponential fallback
         },
         'mempool': {
@@ -164,6 +165,6 @@ def kill(ctx):
 def logs(ctx):
     ''' Print a summary of the logs '''
     try:
-        print(LogParser.process('./logs').result())
+        LogParser.process('./logs').print("./results/temp_result.txt","./results/temp_txs.txt","./results/temp_latency.txt")
     except ParseError as e:
         Print.error(BenchError('Failed to parse logs', e))
